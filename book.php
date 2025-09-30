@@ -61,7 +61,7 @@ if ($book) {
 	if ($genre) echo '<p class="card-text mb-1"><strong>Genre:</strong> ' . $genre . '</p>';
 	if ($pages) echo '<p class="card-text mb-1"><strong>Pages:</strong> ' . $pages . '</p>';
 	if ($desc) echo '<p class="card-text mt-3">' . $desc . '</p>';
-	echo '<a href="index.php" class="btn btn-primary mt-3">Back to list</a>';
+	echo '<a href="list.php" class="btn btn-primary mt-3">Back to list</a>';
 	echo '</div>';
 	echo '</div>';
 	echo '</div>';
