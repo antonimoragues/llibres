@@ -48,8 +48,13 @@ if (empty($books)) {
         $name = htmlspecialchars($book->getTitle());
         $author = htmlspecialchars($book->getAuthor());
         $image = htmlspecialchars($book->getImageUrl());
+        $id = $book->getId();
+        $detailUrl = $id !== null ? 'book.php?id=' . urlencode((string) $id) : null;
         echo '<div class="col">';
-        echo '<div class="card h-100 shadow-sm position-relative">';
+        if ($detailUrl !== null) {
+            echo '<a href="' . $detailUrl . '" class="text-decoration-none text-reset d-block h-100" aria-label="View details for ' . $name . '">';
+        }
+        echo '<div class="card h-100 shadow-sm">';
         echo '<img src="' . $image . '" class="card-img-top" alt="' . $name . ' cover" style="height: 240px; object-fit: cover;">';
         echo '<div class="card-body">';
         echo '<h5 class="card-title">' . $name . '</h5>';
@@ -62,6 +67,9 @@ if (empty($books)) {
         }
         echo '</div>';
         echo '</div>';
+        if ($detailUrl !== null) {
+            echo '</a>';
+        }
         echo '</div>';
     }
     echo '</div>';
