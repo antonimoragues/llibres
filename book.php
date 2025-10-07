@@ -22,16 +22,11 @@ try {
 $id = isset($_GET['id']) ? (int) $_GET['id'] : 0;
 $book = null;
 
+require_once __DIR__ . '/src/Book.php';
+
 if ($id > 0) {
         try {
-                $stmt = $pdo->prepare(
-                        'SELECT b.title, b.author, b.publication_year, b.image, b.pages, b.description, g.name AS genre
-                         FROM books b
-                         INNER JOIN genres g ON b.genre_id = g.id
-                         WHERE b.id = :id'
-                );
-                $stmt->execute([':id' => $id]);
-                $book = $stmt->fetch();
+                $book = Book::findById($pdo, $id);
         } catch (PDOException $e) {
                 echo 'Error retrieving book data.';
                 exit;
@@ -48,29 +43,25 @@ echo '<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstra
 echo '</head>';
 echo '<body class="bg-light">';
 echo '<div class="container-fluid py-5">';
-if ($book) {
-        $name = htmlspecialchars($book['title']);
-        $author = htmlspecialchars($book['author']);
-        $image = !empty($book['image']) ? htmlspecialchars($book['image']) : 'https://via.placeholder.com/120x180?text=Book';
-        $year = !empty($book['publication_year']) ? htmlspecialchars((string) $book['publication_year']) : '';
-        $genre = !empty($book['genre']) ? htmlspecialchars($book['genre']) : '';
-        $pages = isset($book['pages']) ? (int) $book['pages'] : null;
-        $desc = !empty($book['description']) ? htmlspecialchars($book['description']) : '';
+if ($book instanceof Book) {
+        $name = htmlspecialchars($book->getTitle());
+        $author = htmlspecialchars($book->getAuthor());
+        $image = htmlspecialchars($book->getImageUrl());
         echo '<div class="row justify-content-center">';
         echo '<div class="col-12 col-md-10 col-lg-8">';
         echo '<div class="card shadow px-4">';
-	echo '<div class="row g-0">';
-	echo '<div class="col-md-5">';
-	echo '<img src="' . $image . '" class="img-fluid rounded-start w-100" alt="' . $name . ' cover" style="height:100%;object-fit:cover;">';
-	echo '</div>';
-	echo '<div class="col-md-7">';
-	echo '<div class="card-body">';
-	echo '<h3 class="card-title">' . $name . '</h3>';
-	echo '<p class="card-text mb-1"><strong>Author:</strong> ' . $author . '</p>';
-	if ($year) echo '<p class="card-text mb-1"><strong>Year:</strong> ' . $year . '</p>';
-	if ($genre) echo '<p class="card-text mb-1"><strong>Genre:</strong> ' . $genre . '</p>';
-        if (!is_null($pages) && $pages > 0) echo '<p class="card-text mb-1"><strong>Pages:</strong> ' . $pages . '</p>';
-	if ($desc) echo '<p class="card-text mt-3">' . $desc . '</p>';
+        echo '<div class="row g-0">';
+        echo '<div class="col-md-5">';
+        echo '<img src="' . $image . '" class="img-fluid rounded-start w-100" alt="' . $name . ' cover" style="height:100%;object-fit:cover;">';
+        echo '</div>';
+        echo '<div class="col-md-7">';
+        echo '<div class="card-body">';
+        echo '<h3 class="card-title">' . $name . '</h3>';
+        echo '<p class="card-text mb-1"><strong>Author:</strong> ' . $author . '</p>';
+        if ($book->hasPublicationYear()) echo '<p class="card-text mb-1"><strong>Year:</strong> ' . htmlspecialchars((string) $book->getPublicationYear()) . '</p>';
+        if ($book->hasGenre()) echo '<p class="card-text mb-1"><strong>Genre:</strong> ' . htmlspecialchars((string) $book->getGenre()) . '</p>';
+        if ($book->hasPages()) echo '<p class="card-text mb-1"><strong>Pages:</strong> ' . htmlspecialchars((string) $book->getPages()) . '</p>';
+        if ($book->hasDescription()) echo '<p class="card-text mt-3">' . htmlspecialchars((string) $book->getDescription()) . '</p>';
 	echo '<a href="index.php" class="btn btn-primary mt-3">Back to list</a>';
 	echo '</div>';
 	echo '</div>';
