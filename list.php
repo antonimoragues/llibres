@@ -18,14 +18,10 @@ try {
     exit;
 }
 
+require_once __DIR__ . '/src/Book.php';
+
 try {
-    $stmt = $pdo->query(
-        'SELECT b.title, b.author, b.publication_year, b.image, g.name AS genre
-         FROM books b
-         INNER JOIN genres g ON b.genre_id = g.id
-         ORDER BY b.title'
-    );
-    $books = $stmt->fetchAll();
+    $books = Book::fetchAll($pdo);
 } catch (PDOException $e) {
     echo 'Error retrieving books data.';
     exit;
@@ -49,23 +45,31 @@ if (empty($books)) {
 } else {
     echo '<div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-4">';
     foreach ($books as $book) {
-        $name = htmlspecialchars($book['title']);
-        $author = htmlspecialchars($book['author']);
-        $image = !empty($book['image']) ? htmlspecialchars($book['image']) : 'https://via.placeholder.com/120x180?text=Book';
+        $name = htmlspecialchars($book->getTitle());
+        $author = htmlspecialchars($book->getAuthor());
+        $image = htmlspecialchars($book->getImageUrl());
+        $id = $book->getId();
+        $detailUrl = $id !== null ? 'book.php?id=' . urlencode((string) $id) : null;
         echo '<div class="col">';
+        if ($detailUrl !== null) {
+            echo '<a href="' . $detailUrl . '" class="text-decoration-none text-reset d-block h-100" aria-label="View details for ' . $name . '">';
+        }
         echo '<div class="card h-100 shadow-sm">';
         echo '<img src="' . $image . '" class="card-img-top" alt="' . $name . ' cover" style="height: 240px; object-fit: cover;">';
         echo '<div class="card-body">';
         echo '<h5 class="card-title">' . $name . '</h5>';
         echo '<p class="card-text text-muted mb-1">by ' . $author . '</p>';
-        if (!empty($book['publication_year'])) {
-            echo '<p class="card-text small mb-0">Year: ' . htmlspecialchars((string) $book['publication_year']) . '</p>';
+        if ($book->hasPublicationYear()) {
+            echo '<p class="card-text small mb-0">Year: ' . htmlspecialchars((string) $book->getPublicationYear()) . '</p>';
         }
-        if (!empty($book['genre'])) {
-            echo '<p class="card-text small text-secondary">' . htmlspecialchars($book['genre']) . '</p>';
+        if ($book->hasGenre()) {
+            echo '<p class="card-text small text-secondary">' . htmlspecialchars((string) $book->getGenre()) . '</p>';
         }
         echo '</div>';
         echo '</div>';
+        if ($detailUrl !== null) {
+            echo '</a>';
+        }
         echo '</div>';
     }
     echo '</div>';
