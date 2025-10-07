@@ -2,9 +2,9 @@
 // Database connection settings with environment variable overrides
 $dbHost = getenv('DB_HOST') ?: 'localhost';
 $dbPort = getenv('DB_PORT') ?: '3306';
-$dbName = getenv('DB_DATABASE') ?: 'books_db';
+$dbName = getenv('DB_DATABASE') ?: 'llibres';
 $dbUser = getenv('DB_USERNAME') ?: 'root';
-$dbPass = getenv('DB_PASSWORD') ?: '';
+$dbPass = getenv('DB_PASSWORD') ?: 'secret';
 
 $dsn = sprintf('mysql:host=%s;port=%s;dbname=%s;charset=utf8mb4', $dbHost, $dbPort, $dbName);
 
